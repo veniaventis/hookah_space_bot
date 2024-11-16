@@ -8,7 +8,7 @@ from aiogram.filters import Command, StateFilter
 router = Router()
 
 
-@router.message(Command("start"), F.from_user.id.in_({5477880310}))
+@router.message(Command("start_shift"), F.from_user.id.in_({5477880310,1614891721}))
 async def start_command(message: types.Message, state: FSMContext):
     await message.answer("Выберите точку продаж:", reply_markup=get_point_selection_keyboard())
     await state.set_state(ShiftStates.choose_point)
@@ -19,8 +19,9 @@ async def start_command(message: types.Message, state: FSMContext):
 async def select_point(callback: types.CallbackQuery, state: FSMContext):
     point = "Bliski Wschod" if callback.data == "point_bliski" else "Aioli"
     await state.update_data(point=point)
-    await callback.message.edit_text(f"Вы выбрали точку: <b>{point}</b>.\n\nНажмите <i>'Открыть смену'</i>. Или выберите другую точку.",
-                                     reply_markup=get_shift_management_keyboard())
+    await callback.message.edit_text(
+        f"Вы выбрали точку: <b>{point}</b>.\n\nНажмите <i>'Открыть смену'</i>. Или выберите другую точку.",
+        reply_markup=get_shift_management_keyboard())
 
 
 @router.callback_query(F.data == "open_shift")
@@ -49,13 +50,13 @@ async def enter_cash(message: types.Message, state: FSMContext):
         await message.answer("Пожалуйста, введите корректное число для суммы в кассе.")
 
 
-@router.callback_query(StateFilter(ShiftStates.confirm_cash), F.data == "confirm_cash")
+@router.callback_query(StateFilter(ShiftStates.confirm_cash), F.data == "confirm")
 async def confirm_cash(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.edit_text("Теперь отправте фотографию веса табака.")
     await state.set_state(ShiftStates.upload_tobacco_photo)
 
 
-@router.callback_query(StateFilter(ShiftStates.confirm_cash), F.data == "change_cash")
+@router.callback_query(StateFilter(ShiftStates.confirm_cash), F.data == "change")
 async def change_cash(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.edit_text("Пожалуйста, введите корректную сумму в кассе:")
     await state.set_state(ShiftStates.enter_cash)
@@ -100,3 +101,113 @@ async def change_photo(callback: types.CallbackQuery, state: FSMContext):
         caption="Пожалуйста, загрузите новую фотографию веса табака.",
     )
     await state.set_state(ShiftStates.upload_tobacco_photo)
+
+
+@router.message(Command("close_shift"), F.from_user.id.in_({5477880310, 1614891721}), StateFilter(ShiftStates.working))
+async def close_shift_start(message: types.Message, state: FSMContext):
+    await message.reply("Введите раппорт кассы (сумма в кассе):")
+    await state.set_state(ShiftStates.enter_cash_report)
+
+
+@router.message(StateFilter(ShiftStates.enter_cash_report))
+async def enter_cash_report(message: types.Message, state: FSMContext):
+    try:
+        cash_report = float(message.text)
+        await state.update_data(cash_report=cash_report)
+        await message.answer(
+            f"Вы ввели рапорт кассы: <b>{cash_report}</b>. Подтвердите или измените.",
+            reply_markup=get_confirmation_keyboard()
+        )
+    except ValueError:
+        await message.answer("Пожалуйста, введите корректное число.")
+
+
+@router.callback_query(StateFilter(ShiftStates.enter_cash_report), F.data == "confirm")
+async def confirm_cash_report(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.edit_text("Теперь введите рапорт терминала.")
+    await state.set_state(ShiftStates.enter_terminal_report)
+
+
+@router.callback_query(StateFilter(ShiftStates.enter_cash_report), F.data == "change")
+async def retry_cash_report(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.edit_text("Введите рапорт кассы ещё раз.")
+    await state.set_state(ShiftStates.enter_cash_report)
+
+
+@router.message(StateFilter(ShiftStates.enter_terminal_report))
+async def enter_terminal_report(message: types.Message, state: FSMContext):
+    try:
+        terminal_report = float(message.text)
+        await state.update_data(terminal_report=terminal_report)
+        await message.answer(
+            f"Вы ввели рапорт терминала: <b>{terminal_report}</b>. Подтвердите или измените.",
+            reply_markup=get_confirmation_keyboard()
+        )
+    except ValueError:
+        await message.answer("Пожалуйста, введите корректное число.")
+
+
+@router.callback_query(StateFilter(ShiftStates.enter_terminal_report), F.data == "confirm")
+async def confirm_terminal_report(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.edit_text("Загрузите фотографию остатка табака.")
+    await state.set_state(ShiftStates.upload_remaining_tobacco)
+
+
+@router.callback_query(StateFilter(ShiftStates.enter_terminal_report), F.data == "change")
+async def retry_terminal_report(callback: types.CallbackQuery):
+    await callback.message.edit_text("Введите рапорт терминала ещё раз.")
+
+
+@router.message(StateFilter(ShiftStates.upload_remaining_tobacco), F.photo)
+async def upload_remaining_tobacco(message: types.Message, state: FSMContext):
+    tobacco_photo = message.photo[-1].file_id
+    await state.update_data(tobacco_photo=tobacco_photo)
+
+    # Подготовка данных для финального подтверждения
+    data = await state.get_data()
+    cash_report = data.get("cash_report")
+    terminal_report = data.get("terminal_report")
+
+    await message.answer_photo(
+        photo=tobacco_photo,
+        caption=(
+            f"Рапорт кассы: <b>{cash_report}</b>\n"
+            f"Рапорт терминала: <b>{terminal_report}</b>\n"
+            f"Фотография веса табака загружена.\n\n"
+            "Подтвердите завершение смены или отмените процесс."
+        ),
+        reply_markup=get_confirmation_keyboard()
+    )
+    await state.set_state(ShiftStates.confirm_close_shift)
+
+
+@router.callback_query(StateFilter(ShiftStates.confirm_close_shift), F.data == "confirm")
+async def finish_shift(callback: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+
+    # Сохраняем данные в базу или журнал (пример).
+    point = data.get("point")
+    cash_report = data.get("cash_report")
+    terminal_report = data.get("terminal_report")
+    tobacco_photo = data.get("tobacco_photo")
+
+    await callback.message.edit_caption(
+        caption=(
+            f"Смена на точке <b>{point}</b> завершена.\n"
+            f"Рапорт кассы: <b>{cash_report}</b>\n"
+            f"Рапорт терминала: <b>{terminal_report}</b>\n\n"
+            "Все данные успешно сохранены."
+        ),
+        parse_mode="HTML",
+        reply_markup=None
+    )
+    await state.clear()
+
+
+@router.callback_query(StateFilter(ShiftStates.confirm_close_shift), F.data == "change")
+async def cancel_finish_shift(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.edit_caption(
+        "Завершение смены отменено. Вы можете повторить процесс",
+        reply_markup=None
+    )
+    await state.set_state(ShiftStates.working)

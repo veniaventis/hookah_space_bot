@@ -32,9 +32,20 @@ def get_photo_confirmation_keyboard():
 
 def get_confirmation_keyboard():
     """Клавиатура для подтверждения суммы в кассе."""
-    confirm = InlineKeyboardButton(text="Да, правильно", callback_data="confirm_cash")
-    change = InlineKeyboardButton(text="Изменить сумму", callback_data="change_cash")
+    confirm = InlineKeyboardButton(text="✅ Подтвердить", callback_data="confirm")
+    change = InlineKeyboardButton(text="🔄 Изменить ", callback_data="change")
     row = [confirm, change]
     rows = [row]
     keyboard = InlineKeyboardMarkup(inline_keyboard=rows)
     return keyboard
+
+
+def get_close_shift_keyboard():
+    """Клавиатура для завершения смены."""
+    close_shift_btn = InlineKeyboardButton("Завершить смену", callback_data="close_shift")
+    cancel_btn = InlineKeyboardButton("Отменить", callback_data="cancel_close_shift")
+    row = [close_shift_btn,cancel_btn]
+    rows = [row]
+    keyboard = InlineKeyboardMarkup(inline_keyboard=rows)
+    return keyboard
+
