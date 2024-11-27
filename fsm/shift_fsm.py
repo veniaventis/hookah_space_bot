@@ -15,3 +15,11 @@ class ShiftStates(StatesGroup):
     enter_terminal_report = State()
     upload_remaining_tobacco = State()
     confirm_close_shift = State()
+
+class OrderStates(StatesGroup):
+    choose_menu = State()
+    choose_flavor = State()
+    apply_discount = State()
+    open_order = State()
+    pay_order = State()
+    close_order = State()
