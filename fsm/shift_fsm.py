@@ -23,3 +23,4 @@ class OrderStates(StatesGroup):
     open_order = State()
     pay_order = State()
     close_order = State()
+   # класс заказа
