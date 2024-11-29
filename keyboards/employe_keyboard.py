@@ -31,7 +31,7 @@ def get_photo_confirmation_keyboard():
 
 
 def get_confirmation_keyboard():
-    """Клавиатура для подтверждения суммы в кассе."""
+    """Клавиатура для подтверждения."""
     confirm = InlineKeyboardButton(text="✅ Подтвердить", callback_data="confirm")
     change = InlineKeyboardButton(text="🔄 Изменить ", callback_data="change")
     row = [confirm, change]
