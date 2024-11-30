@@ -43,6 +43,15 @@ async def select_hookah(callback: types.CallbackQuery, state: FSMContext):
     )
     await state.set_state(OrderStates.pay_order)
 
+@router.callback_query(F.data == "select_payment")
+async def change_payment(callback: types.CallbackQuery, state: FSMContext):
+    # Отправляем пользователю клавиатуру с выбором способа оплаты
+    await callback.message.edit_text(
+        "Выберите новый способ оплаты:",
+        reply_markup=get_payment_keyboard()
+    )
+
+
 @router.callback_query(F.data.in_({"pay_cash", "pay_card", "bonus"}))
 async def select_payment(callback: types.CallbackQuery, state: FSMContext):
     # Получаем выбранный способ оплаты
