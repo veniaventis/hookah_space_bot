@@ -9,7 +9,6 @@ from aiogram.enums import ParseMode
 from config import TOKEN
 from routers import router as main_router
 
-
 async def main() -> None:
     dp = Dispatcher()
     dp.include_routers(main_router)

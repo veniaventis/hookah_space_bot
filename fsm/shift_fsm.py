@@ -18,9 +18,8 @@ class ShiftStates(StatesGroup):
 
 class OrderStates(StatesGroup):
     choose_menu = State()
-    choose_flavor = State()
-    apply_discount = State()
     open_order = State()
     pay_order = State()
     close_order = State()
    # класс заказа
+

@@ -7,8 +7,14 @@ from aiogram.filters import Command, StateFilter
 
 router = Router()
 
-@router.message(Command("order"), F.from_user.id.in_({5477880310,1614891721}))
-async def start_command(message: types.Message, state: FSMContext):
+@router.message(Command("order"), F.from_user.id.in_({5477880310, 1614891721}))
+async def order_command(message: types.Message, state: FSMContext):
+    data = await state.get_data()  # Получаем все данные FSM
+    if not data.get("shift_opened"):  # Проверяем, есть ли флаг и его значение
+        await message.answer("Ошибка: сначала откройте смену с помощью команды /start_shift.")
+        return
+
+    # Если смена открыта, продолжаем выполнение
     await message.answer("Заказ открыт:", reply_markup=get_open_order_keyboard())
     await state.set_state(OrderStates.choose_menu)
 

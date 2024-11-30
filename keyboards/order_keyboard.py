@@ -21,18 +21,25 @@ def get_payment_keyboard():
     cash = InlineKeyboardButton (text= "Оплата наличными", callback_data="pay_cash")
     card = InlineKeyboardButton (text= "Оплата картой", callback_data="pay_card")
     bonus = InlineKeyboardButton (text = "Бонус ", callback_data="bonus")
-    row = [cash, card, bonus]
-    rows = [row]
+    back = InlineKeyboardButton ( text = "Назад", callback_data="choose_menu")
+    rows = [
+        [cash],
+        [card],
+        [bonus],
+        [back]
+        ]
     keyboard = InlineKeyboardMarkup(inline_keyboard=rows)
     return keyboard
 
-# def get_close_order_keyboard():
-#     close = InlineKeyboardButton (text="Звкрыть заказ", callback_data="close")
-#     row = [close]
-#     rows = [row]
-#     keyboard = InlineKeyboardMarkup(inline_keyboard=rows)
-#     return keyboard
 
 def get_close_order_keyboard():
-    close = InlineKeyboardButton(text="Закрыть заказ", callback_data="close")
-    return InlineKeyboardMarkup(inline_keyboard=[[close]])
+    close = InlineKeyboardButton(text="Новый заказ", callback_data="order")
+    close_shift = InlineKeyboardButton (text="Закрыть смену", callback_data="close_shift")
+    back = InlineKeyboardButton ( text="Назад", callback_data="choose_menu")
+    rows = [
+        [close],
+        [close_shift],
+        [back]
+    ]
+    keyboard = InlineKeyboardMarkup(inline_keyboard=rows)
+    return keyboard

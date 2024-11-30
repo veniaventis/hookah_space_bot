@@ -8,8 +8,9 @@ from aiogram.filters import Command, StateFilter
 router = Router()
 
 
-@router.message(Command("start_shift"), F.from_user.id.in_({5477880310,1614891721}))
-async def start_command(message: types.Message, state: FSMContext):
+@router.message(Command("start_shift"), F.from_user.id.in_({5477880310, 1614891721}))
+async def start_shift_command(message: types.Message, state: FSMContext):
+    await state.update_data(shift_opened=True)  # Устанавливаем флаг
     await message.answer("Выберите точку продаж:", reply_markup=get_point_selection_keyboard())
     await state.set_state(ShiftStates.choose_point)
 
