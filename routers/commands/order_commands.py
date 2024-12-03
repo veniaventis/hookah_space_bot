@@ -76,22 +76,3 @@ async def select_payment(callback: types.CallbackQuery, state: FSMContext):
         reply_markup=get_close_order_keyboard()
     )
     await state.set_state(OrderStates.close_order)
-
-@router.callback_query(F.data == "close")
-async def close_order(callback: types.CallbackQuery, state: FSMContext):
-    # Получение данных текущего заказа
-    data = await state.get_data()
-    message_for_admin = (
-        f"Заказ завершён:\n"
-        f"- Тип кальяна: {data['hookah']}\n"
-        f"- Стоимость: {data['price']} zł\n"
-        f"- Способ оплаты: {data['payment']}\n"
-    )
-
-    # Отправка подтверждения админу
-    await callback.message.edit_text(
-        f"{message_for_admin}\nЗаказ закрыт. Готов к следующему!"
-    )
-
-    # Очистка состояния
-    await state.clear()

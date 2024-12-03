@@ -4,12 +4,12 @@ from keyboards.employe_keyboard import get_point_selection_keyboard, get_shift_m
     get_confirmation_keyboard, get_photo_confirmation_keyboard
 from fsm.shift_fsm import ShiftStates
 from aiogram.filters import Command, StateFilter
-
 router = Router()
 
 
 @router.message(Command("start_shift"), F.from_user.id.in_({5477880310, 1614891721,474221646}))
 async def start_command(message: types.Message, state: FSMContext):
+    await state.update_data(shift_opened=True)
     await message.answer("Выберите точку продаж:", reply_markup=get_point_selection_keyboard())
     await state.set_state(ShiftStates.choose_point)
 

@@ -33,13 +33,9 @@ def get_payment_keyboard():
 
 
 def get_close_order_keyboard():
-    close = InlineKeyboardButton(text="Новый заказ", callback_data="choose_menu")
-    close_shift = InlineKeyboardButton (text="Закрыть смену", callback_data="close_shift")
-    back = InlineKeyboardButton ( text="Сахранить заказ", callback_data="choose_menu")
+    back = InlineKeyboardButton ( text="Сахранить заказ", callback_data="close_shift")
     che = InlineKeyboardButton ( text="Изминить способ оплаты", callback_data="select_payment")
     rows = [
-        [close],
-        [close_shift],
         [back],
         [che]
     ]
