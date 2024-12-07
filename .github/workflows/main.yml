@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - '*' # Запускать на всех ветках
-  pull_request:
-    branches:
-      - main # Или другая основная ветка
 
 jobs:
   test-bot:
