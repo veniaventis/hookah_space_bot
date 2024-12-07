@@ -1,0 +1,43 @@
+name: Test Telegram Bot Build
+
+on:
+  push:
+    branches:
+      - '*' # Запускать на всех ветках
+  pull_request:
+    branches:
+      - main # Или другая основная ветка
+
+jobs:
+  test-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12' # Замени на версию, которую используешь
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt # Если есть файл с зависимостями
+
+      - name: Run Telegram Bot
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }} # Добавь BOT_TOKEN в secrets репозитория
+        run: |
+          python hookah_space_bot.py & # Запусти бота в фоне
+          sleep 10 # Подожди несколько секунд, чтобы бот подключился
+
+      - name: Check Bot is Running
+        run: |
+          if pgrep -f "hookah_space_bot.py"; then
+            echo "Bot is running successfully."
+          else
+            echo "Bot failed to start."
+            exit 1
+          fi
