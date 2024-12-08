@@ -1,0 +1,44 @@
+name: Deploy Telegram Bot to OVH
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Клонирование репозитория
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Аутентификация в Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # 3. Сборка и публикация Docker-образа
+      - name: Build and push Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/hookah_space_bot:latest .
+          docker push ${{ secrets.DOCKER_USERNAME }}/hookah_space_bot:latest
+
+      # 4. Перезапуск контейнера на сервере с передачей BOT_TOKEN
+      - name: Deploy to OVH Server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.OVH_SERVER_IP }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker pull ${{ secrets.DOCKER_USERNAME }}/hookah_space_bot:latest
+            docker stop hookah_space_bot || true
+            docker rm hookah_space_bot || true
+            docker run -d --name hookah_space_bot \
+              --restart always \
+              -e BOT_TOKEN=${{ secrets.PROD_BOT_TOKEN }} \
+              ${{ secrets.DOCKER_USERNAME }}/hookah_space_bot:latest
