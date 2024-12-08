@@ -3,7 +3,7 @@ name: Deploy Telegram Bot to OVH
 on:
   push:
     branches:
-      - '*' #change to main after test
+      - '*'
 
 jobs:
   build-and-deploy:
@@ -36,6 +36,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             docker pull ${{ secrets.DOCKER_USERNAME }}/hookah_space_bot:latest
+            docker stop hookah_space_bot || true
+            docker rm hookah_space_bot || true
             docker run -d --name hookah_space_bot \
               --restart always \
               -e BOT_TOKEN=${{ secrets.PROD_BOT_TOKEN }} \
