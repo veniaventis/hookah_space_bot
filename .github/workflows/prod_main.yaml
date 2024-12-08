@@ -36,7 +36,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             docker pull ${{ secrets.DOCKER_USERNAME }}/hookah_space_bot:latest
-            docker run -d --name ${{ secrets.DOCKER_USERNAME }}/hookah_space_bot:latest \
+            docker run -d --name hookah_space_bot \
               --restart always \
               -e BOT_TOKEN=${{ secrets.PROD_BOT_TOKEN }} \
               ${{ secrets.DOCKER_USERNAME }}/hookah_space_bot:latest
