@@ -8,7 +8,7 @@ from aiogram.filters import Command, StateFilter
 router = Router()
 
 
-@router.message(Command("start_shift"), F.from_user.id.in_({5477880310, 1614891721,474221646}))
+@router.message(Command("start_shift"), F.from_user.id.in_({5477880310, 1614891721,474221646, 302383927}))
 async def start_command(message: types.Message, state: FSMContext):
     await message.answer("Выберите точку продаж:", reply_markup=get_point_selection_keyboard())
     await state.set_state(ShiftStates.choose_point)
@@ -103,7 +103,7 @@ async def change_photo(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(ShiftStates.upload_tobacco_photo)
 
 
-@router.message(Command("close_shift"), StateFilter(ShiftStates.working), F.from_user.id.in_({5477880310, 1614891721,474221646})) #Когда появится база данных добавить сюда id пользователей
+@router.message(Command("close_shift"), StateFilter(ShiftStates.working), F.from_user.id.in_({5477880310, 1614891721,474221646, 302383927})) #Когда появится база данных добавить сюда id пользователей
 async def close_shift_start(message: types.Message, state: FSMContext):
     await message.reply("Введите раппорт кассы (сумма в кассе):")
     await state.set_state(ShiftStates.enter_cash_report)
