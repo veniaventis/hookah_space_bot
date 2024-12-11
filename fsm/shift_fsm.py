@@ -18,3 +18,12 @@ class ShiftStates(StatesGroup):
     add_remaining_coals = State()
     extra_information = State()
     confirm_close_shift = State()
+
+class OrderStates(StatesGroup):
+    choose_menu = State()
+    choose_flavor = State()
+    apply_discount = State()
+    open_order = State()
+    pay_order = State()
+    close_order = State()
+   # класс заказа
