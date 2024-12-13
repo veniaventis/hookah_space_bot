@@ -20,16 +20,15 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo python -m pip install --upgrade pip
-          sudo pip install -r requirements.txt # Если есть файл с зависимостями
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt # Если есть файл с зависимостями
 
       - name: Run Telegram Bot
         env:
           BOT_TOKEN: ${{ secrets.TEST_BOT_TOKEN }} # Добавь BOT_TOKEN в secrets репозитория
           DATA_BASE_URL: ${{ secrets.DATA_BASE_URL }} # Добавь DATA_BASE_URL в secrets репозитория
         run: |
-          sudo mkdir -p /app/data/
-          sudo python hookah_space_bot.py & # Запусти бота в фоне
+          python hookah_space_bot.py & # Запусти бота в фоне
           sleep 10 # Подожди несколько секунд, чтобы бот подключился
           ls -la /app/data/
 
