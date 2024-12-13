@@ -26,9 +26,11 @@ jobs:
       - name: Run Telegram Bot
         env:
           BOT_TOKEN: ${{ secrets.TEST_BOT_TOKEN }} # Добавь BOT_TOKEN в secrets репозитория
+          DATA_BASE_URL: ${{ secrets.DATA_BASE_URL }} # Добавь DATA_BASE_URL в secrets репозитория
         run: |
           python hookah_space_bot.py & # Запусти бота в фоне
           sleep 10 # Подожди несколько секунд, чтобы бот подключился
+          ls -la /app/data/
 
       - name: Check Bot is Running
         run: |
