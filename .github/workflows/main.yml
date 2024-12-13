@@ -29,7 +29,7 @@ jobs:
           DATA_BASE_URL: ${{ secrets.DATA_BASE_URL }} # Добавь DATA_BASE_URL в secrets репозитория
         run: |
           sudo mkdir -p /app/data/
-          python hookah_space_bot.py & # Запусти бота в фоне
+          sudo python hookah_space_bot.py & # Запусти бота в фоне
           sleep 10 # Подожди несколько секунд, чтобы бот подключился
           ls -la /app/data/
 
