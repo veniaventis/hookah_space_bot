@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import select, update
-from db.models.models import Shift, PointOfSale, Employee
+from db.models.models import Shift, PointOfSale
 from .base import connection
 
 
