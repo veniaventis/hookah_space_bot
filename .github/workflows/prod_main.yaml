@@ -3,7 +3,7 @@ name: Deploy Telegram Bot to OVH
 on:
   push:
     branches:
-      - main
+      - '*'
 
 jobs:
   build-and-deploy:
@@ -40,5 +40,7 @@ jobs:
             docker rm hookah_space_bot || true
             docker run -d --name hookah_space_bot \
               --restart always \
+              -v ~/hookah_space_bot_data:/app/data \
+              -e DATA_BASE_URL=${{ secrets.DATA_BASE_URL }} \
               -e BOT_TOKEN=${{ secrets.PROD_BOT_TOKEN }} \
               ${{ secrets.DOCKER_USERNAME }}/hookah_space_bot:latest
