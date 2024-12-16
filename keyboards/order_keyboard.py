@@ -2,7 +2,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 def get_open_order_keyboard():
-    # Клавиатура для открытия и  старта заказа
+    # Клавиатура для открытия и старта заказа
     start_order = InlineKeyboardButton ( text="Продолжить", callback_data="choose_menu")
     row = [start_order]
     rows = [row]
@@ -22,7 +22,7 @@ def get_payment_keyboard():
     cash = InlineKeyboardButton (text= "Оплата наличными", callback_data="pay_cash")
     card = InlineKeyboardButton (text= "Оплата картой", callback_data="pay_card")
     bonus = InlineKeyboardButton (text = "Бонус ", callback_data="bonus")
-    back = InlineKeyboardButton ( text = " Назад", callback_data="price_option")
+    back = InlineKeyboardButton ( text = " Вернуться", callback_data="price_option")
     rows = [
            [cash],
            [card],

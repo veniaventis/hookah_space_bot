@@ -20,6 +20,8 @@ class ShiftStates(StatesGroup):
     confirm_close_shift = State()
 
 class OrderStates(StatesGroup):
+    select_payment = State()
+    change_price = State()
     choose_menu = State()
     open_order = State()
     pay_order = State()
