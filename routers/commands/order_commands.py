@@ -46,8 +46,8 @@ async def select_hookah(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(OrderStates.confirm_price)
 
 
-@router.callback_query(F.data == "pop")
-async def pop_to_choose_menu(callback: types.CallbackQuery, state: FSMContext):
+@router.callback_query(F.data == "back_to")
+async def back_to_choose_menu(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.edit_text(text="Выберите кальян", reply_markup=get_choose_menu_keyboard())
     await state.set_state(OrderStates.choose_menu)
 
@@ -93,6 +93,7 @@ async def enter_custom_price(message: types.Message, state: FSMContext):
 @router.message(StateFilter(OrderStates.enter_comment))
 async def enter_comment(message: types.Message, state: FSMContext):
     comment = message.text
+    data = await state.get_data()
     data = await state.get_data()
     hookah = data.get("hookah")
     price = data.get("price")
@@ -141,7 +142,8 @@ async def back_change_payment(callback: types.CallbackQuery, state: FSMContext):
 
 @router.callback_query(F.data == "close_order")
 async def close_order(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.answer(
-        "Заказ принят и закрыт. спасибо",
+    await callback.message.edit_text(
+        "Заказ принят и закрыт.\nCпасибо",
     )
+    await state.clear()
     await state.set_state(ShiftStates.working)
