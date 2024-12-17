@@ -15,7 +15,6 @@ class ShiftStates(StatesGroup):
     enter_terminal_report = State()
     upload_remaining_tobacco = State()
     confirm_remaining_tobacco_photo = State()
-    add_remaining_coals = State()
     extra_information = State()
     confirm_close_shift = State()
 
