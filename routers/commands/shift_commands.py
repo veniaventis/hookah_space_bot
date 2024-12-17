@@ -6,7 +6,8 @@ from keyboards.employe_keyboard import get_point_selection_keyboard, get_shift_m
     get_confirmation_keyboard, get_photo_confirmation_keyboard
 from fsm.shift_fsm import ShiftStates
 from aiogram.filters import Command, StateFilter
-from db.crud import create_shift, initialize_points_of_sale, get_point_name_by_shift_id, close_shift
+from db.crud import create_shift, initialize_points_of_sale, get_point_name_by_shift_id, close_shift, \
+    get_start_shift_cash
 from utils.caption_utils import final_info_util
 
 router = Router()
@@ -220,7 +221,7 @@ async def finish_shift(callback: types.CallbackQuery, state: FSMContext):
 
     # Сохраняем данные в базу или журнал (пример).
     point = await get_point_name_by_shift_id(callback.from_user.id)
-    start_shift_money = data.get("cash")
+    start_shift_money = await get_start_shift_cash(callback.from_user.id)
     end_shift_cash_report = data.get("cash_report")
     terminal_report = data.get("terminal_report")
     extra_information = data.get("extra_information")

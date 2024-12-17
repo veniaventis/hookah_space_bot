@@ -70,6 +70,14 @@ async def get_point_name_by_shift_id(session, employee_id: int):
 
 
 @connection
+async def get_start_shift_cash(session, employee_id: int):
+    active_shift = await get_active_shift(employee_id)
+    query = select(Shift.start_shift_cash).where(Shift.id == active_shift.id)
+    result = await session.execute(query)
+    return result.scalar()
+
+
+@connection
 async def close_shift(
         session,
         cash_report: float,
