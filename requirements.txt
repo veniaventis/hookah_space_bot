@@ -48,3 +48,5 @@ urllib3==2.2.3
 virtualenv==20.27.1
 xattr==1.1.0
 yarl==1.17.1
+aiosqlite==0.20.0
+sqlalchemy==2.0.36

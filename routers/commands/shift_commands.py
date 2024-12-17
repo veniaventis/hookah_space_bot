@@ -4,12 +4,15 @@ from keyboards.employe_keyboard import get_point_selection_keyboard, get_shift_m
     get_confirmation_keyboard, get_photo_confirmation_keyboard
 from fsm.shift_fsm import ShiftStates
 from aiogram.filters import Command, StateFilter
+from db.base import create_tables
+from db.crud import create_shift,initialize_points_of_sale
 
 router = Router()
 
 
-@router.message(Command("start_shift"), F.from_user.id.in_({5477880310, 1614891721,474221646}))
+@router.message(Command("start_shift"), F.from_user.id.in_({5477880310, 1614891721,474221646, 302383927}))
 async def start_command(message: types.Message, state: FSMContext):
+    await initialize_points_of_sale()
     await message.answer("Выберите точку продаж:", reply_markup=get_point_selection_keyboard())
     await state.set_state(ShiftStates.choose_point)
 
@@ -91,6 +94,7 @@ async def confirm_photo(callback: types.CallbackQuery, state: FSMContext):
             f"Хорошего рабочего дня! 😊"
         )
     )
+    await create_shift(start_shift_cash=cash, tobacco_photo_id=data.get("tobacco_photo"), employee_id=callback.from_user.id, point_name=point)
     await state.set_state(ShiftStates.working)
 
 
@@ -103,7 +107,7 @@ async def change_photo(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(ShiftStates.upload_tobacco_photo)
 
 
-@router.message(Command("close_shift"), StateFilter(ShiftStates.working), F.from_user.id.in_({5477880310, 1614891721,474221646})) #Когда появится база данных добавить сюда id пользователей
+@router.message(Command("close_shift"), StateFilter(ShiftStates.working), F.from_user.id.in_({5477880310, 1614891721,474221646, 302383927})) #Когда появится база данных добавить сюда id пользователей
 async def close_shift_start(message: types.Message, state: FSMContext):
     await message.reply("Введите раппорт кассы (сумма в кассе):")
     await state.set_state(ShiftStates.enter_cash_report)
