@@ -27,6 +27,11 @@ jobs:
             -e DATA_BASE_URL=${DATA_BASE_URL} \
             test-telegram-bot
 
+      - name: Wait for bot to start
+        run: |
+          echo "Waiting for 10 seconds to allow the bot to start..."
+          sleep 10
+
       - name: Check container status
         run: |
           STATUS=$(docker inspect -f '{{.State.Status}}' telegram-bot-container)
