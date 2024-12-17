@@ -6,7 +6,8 @@ from keyboards.order_keyboard import (
     get_choose_menu_keyboard,
     get_payment_keyboard,
     get_close_order_keyboard,
-    get_price_option_keyboard
+    get_price_option_keyboard,
+    get_payment_keyboard_back
 )
 from fsm.shift_fsm import ShiftStates, OrderStates
 
@@ -18,12 +19,12 @@ async def order_command(message: types.Message, state: FSMContext):
     await message.answer("Заказ открыт:", reply_markup=get_open_order_keyboard())
     await state.set_state(OrderStates.choose_menu)
 
-@router.callback_query(F.data == "choose_menu", StateFilter(OrderStates.choose_menu))
+@router.callback_query(F.data == "choose_menu")
 async def continue_order(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.edit_text("Выберите тип кальяна:", reply_markup=get_choose_menu_keyboard())
     await state.set_state(OrderStates.choose_menu)
 
-@router.callback_query(F.data.in_({"position_menu_medium", "position_menu_light", "position_menu_fruit"}), StateFilter(OrderStates.choose_menu))
+@router.callback_query( StateFilter(OrderStates.choose_menu))
 async def select_hookah(callback: types.CallbackQuery, state: FSMContext):
     hookah_prices = {
         "position_menu_medium": {"name": "Медиум", "price": 150},
@@ -41,6 +42,12 @@ async def select_hookah(callback: types.CallbackQuery, state: FSMContext):
     )
     await state.set_state(OrderStates.confirm_price)
 
+@router.callback_query (F.data== "pop")
+async def pop_to_choose_menu(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.edit_text (text="Выберите кальян", reply_markup=get_choose_menu_keyboard())
+    await state.set_state(OrderStates.choose_menu)
+
+
 @router.callback_query(F.data == "leave_price", StateFilter(OrderStates.confirm_price))
 async def leave_price(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
@@ -51,6 +58,11 @@ async def leave_price(callback: types.CallbackQuery, state: FSMContext):
         reply_markup=get_payment_keyboard()
     )
     await state.set_state(OrderStates.pay_order)
+
+@router.callback_query (F.data=="go_back")
+async def back_to_pay_order(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.edit_text (text="Хочешь изменить цену?", reply_markup=get_price_option_keyboard())
+    await state.set_state(OrderStates.confirm_price)
 
 @router.callback_query(F.data == "change_price", StateFilter(OrderStates.confirm_price))
 async def ask_custom_price(callback: types.CallbackQuery, state: FSMContext):
@@ -110,3 +122,17 @@ async def select_payment(callback: types.CallbackQuery, state: FSMContext):
         reply_markup=get_close_order_keyboard()
    )
     await state.set_state(OrderStates.close_order)
+
+@router.callback_query (F.data=="change_payment")
+async def back_change_payment(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.edit_text (text="Изменить спомоб оплаты", reply_markup=get_payment_keyboard_back())
+    await state.set_state(OrderStates.pay_order)
+
+
+@router.callback_query (F.data=="close_order")
+async def close_order(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer(
+        "Заказ принят и закрыт. спасибо",
+        reply_markup=None
+    )
+    await state.set_state(ShiftStates.working)
