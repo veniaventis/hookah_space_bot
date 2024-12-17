@@ -17,17 +17,28 @@ jobs:
         run: |
           docker build -t test-telegram-bot .
 
-      - name: Run tests in temporary Docker container
+      - name: Run Telegram Bot in container
         env:
           BOT_TOKEN: ${{ secrets.TEST_BOT_TOKEN }}
           DATA_BASE_URL: ${{ secrets.DATA_BASE_URL }}
         run: |
-          docker run --rm \
+          docker run -d --name telegram-bot-container \
             -e BOT_TOKEN=${BOT_TOKEN} \
             -e DATA_BASE_URL=${DATA_BASE_URL} \
-            test-telegram-bot \
-            /bin/bash -c "
-              sleep 5 && \
-              ps aux | grep 'hookah_space_bot.py' | grep -v grep && \
-              echo 'Bot is running successfully.' || (echo 'Bot failed to start.' && exit 1)
-            "
+            test-telegram-bot
+
+      - name: Check container status
+        run: |
+          STATUS=$(docker inspect -f '{{.State.Status}}' telegram-bot-container)
+          if [ "$STATUS" = "running" ]; then
+            echo "Container is running successfully."
+          else
+            echo "Container failed to start. Status: $STATUS"
+            exit 1
+          fi
+
+      - name: Stop and clean up container
+        if: always()
+        run: |
+          docker stop telegram-bot-container
+          docker rm telegram-bot-container
