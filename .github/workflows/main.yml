@@ -28,10 +28,6 @@ jobs:
             test-telegram-bot \
             /bin/bash -c "
               sleep 5 && \
-              if pgrep -f 'hookah_space_bot.py'; then
-                echo 'Bot is running successfully.';
-              else
-                echo 'Bot failed to start.';
-                exit 1;
-              fi
+              ps aux | grep 'hookah_space_bot.py' | grep -v grep && \
+              echo 'Bot is running successfully.' || (echo 'Bot failed to start.' && exit 1)
             "
