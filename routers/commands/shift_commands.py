@@ -4,8 +4,8 @@ from keyboards.employe_keyboard import get_point_selection_keyboard, get_shift_m
     get_confirmation_keyboard, get_photo_confirmation_keyboard
 from fsm.shift_fsm import ShiftStates
 from aiogram.filters import Command, StateFilter
-from db.base import create_tables
 from db.crud import create_shift, initialize_points_of_sale
+from utils.caption_utils import final_info_util
 
 router = Router()
 
@@ -156,37 +156,13 @@ async def enter_terminal_report(message: types.Message, state: FSMContext):
 
 @router.callback_query(StateFilter(ShiftStates.enter_terminal_report), F.data == "confirm")
 async def confirm_terminal_report(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.edit_text("Введите количество оставшиихся упаковок углей?")
-    await state.set_state(ShiftStates.add_remaining_coals)
+    await callback.message.edit_text("Пришлите фотографию оставшегося табака.")
+    await state.set_state(ShiftStates.upload_remaining_tobacco)
 
 
 @router.callback_query(StateFilter(ShiftStates.enter_terminal_report), F.data == "change")
 async def retry_terminal_report(callback: types.CallbackQuery):
     await callback.message.edit_text("Введите рапорт терминала ещё раз.")
-
-
-@router.message(StateFilter(ShiftStates.add_remaining_coals))
-async def add_remaining_coals(message: types.Message, state: FSMContext):
-    try:
-        remaining_coals = int(message.text)
-        await state.update_data(add_remaining_coals=remaining_coals)
-        await message.answer(
-            f"Вы ввели <b>{remaining_coals}</b> количество. Подтвердить или изменить?",
-            reply_markup=get_confirmation_keyboard()
-        )
-    except ValueError:
-        await message.answer("Пожалуйста, введите корректное число")
-
-
-@router.callback_query(StateFilter(ShiftStates.add_remaining_coals), F.data == "confirm")
-async def confirm_coals_count(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.edit_text("Пришлите фотографию оставшегося количества тобака")
-    await state.set_state(ShiftStates.upload_remaining_tobacco)
-
-
-@router.callback_query(StateFilter(ShiftStates.add_remaining_coals), F.data == "change")
-async def retry_coals_count(callback: types.CallbackQuery):
-    await callback.message.edit_text("Введите количество оставшихся углей?")
 
 
 @router.message(StateFilter(ShiftStates.upload_remaining_tobacco), F.photo)
@@ -204,7 +180,7 @@ async def upload_remaining_tobacco(message: types.Message, state: FSMContext):
 
 @router.callback_query(StateFilter(ShiftStates.confirm_remaining_tobacco_photo), F.data == "confirm_photo")
 async def confirm_tobacco_photo(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.answer("Введите допалнительную информацию (Напрмиер количество фруктов)")
+    await callback.message.answer("Введите допалнительную информацию (Напрмиер количество фруктов, количество оставщихся углей)")
     await state.set_state(ShiftStates.extra_information)
 
 
@@ -224,18 +200,12 @@ async def final_info(message: types.Message, state: FSMContext):
     cash_report = data.get("cash_report")
     terminal_report = data.get("terminal_report")
     tobacco_photo = data.get("tobacco_photo")
-    remaining_coals = data.get("add_remaining_coals")
     extra_information = data.get("extra_information")
 
     await message.answer_photo(
         photo=tobacco_photo,
         caption=(
-            f"Рапорт кассы: <b>{cash_report}</b>\n"
-            f"Рапорт терминала: <b>{terminal_report}</b>\n"
-            f"Количество углей: <b>{remaining_coals}</b>\n\n"
-            f"Дополнительная информация <b>{extra_information}</b>\n\n"
-            f"Фотография веса табака загружена.\n\n"
-            "Подтвердите завершение смены или отмените процесс."
+            final_info_util(cash_report, terminal_report, extra_information)
         ),
         reply_markup=get_confirmation_keyboard()
     )
@@ -251,7 +221,6 @@ async def finish_shift(callback: types.CallbackQuery, state: FSMContext):
     start_shift_money = data.get("cash")
     cash_report = data.get("cash_report")
     terminal_report = data.get("terminal_report")
-    remaining_coals = data.get("add_remaining_coals")
     extra_information = data.get("extra_information")
 
     await callback.message.edit_caption(
@@ -260,7 +229,6 @@ async def finish_shift(callback: types.CallbackQuery, state: FSMContext):
             f"Сумма в кассе на начало смены: <b>{start_shift_money}</b>\n\n"
             f"Рапорт кассы: <b>{cash_report}</b>\n"
             f"Рапорт терминала: <b>{terminal_report}</b>\n\n"
-            f"Количество углей: <b>{remaining_coals}</b>\n\n"
             f"Дополнительная информация <b>{extra_information}</b>\n\n"
 
             "Все данные успешно сохранены."
