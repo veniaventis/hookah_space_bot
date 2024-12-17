@@ -44,7 +44,6 @@ class Shift(Base):
     end_shift_cash: Mapped[int] = mapped_column(Integer, nullable=True)
     end_shift_terminal_report: Mapped[str] = mapped_column(Integer, nullable=True)
     end_shift_tobacco_photo_id: Mapped[str] = mapped_column(Text, nullable=True)
-    end_shift_coals_count: Mapped[int] = mapped_column(Integer, nullable=True)
     extra_information: Mapped[str] = mapped_column(Text, nullable=True)
     close_datetime: Mapped[str] = mapped_column(DateTime, nullable=True)
 
