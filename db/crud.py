@@ -54,25 +54,45 @@ async def create_shift(session, start_shift_cash: float, tobacco_photo_id: str, 
 async def get_active_shift(session, employee_id: int):
     query = select(Shift).where(Shift.employee_id == employee_id, Shift.close_datetime == None)
     result = await session.execute(query)
-    shift = result.scalars().first()
-    return shift
+    return result.scalars().first()
+
+
+@connection
+async def get_point_name_by_shift_id(session, employee_id: int):
+    active_shift = await get_active_shift(employee_id)
+
+    if active_shift is None:
+        return None
+
+    query = select(Shift.point).where(Shift.id == active_shift.id)
+    result = await session.execute(query)
+    return result.scalar()
+
+
+@connection
+async def get_start_shift_cash(session, employee_id: int):
+    active_shift = await get_active_shift(employee_id)
+    query = select(Shift.start_shift_cash).where(Shift.id == active_shift.id)
+    result = await session.execute(query)
+    return result.scalar()
 
 
 @connection
 async def close_shift(
+        session,
         cash_report: float,
         terminal_report: float,
         tobacco_photo: str,
-        remaining_coals: float,
         extra_information: str,
-        session=None
+        employee_id: int,
 ):
-    query = update(Shift).where(Shift.id == get_active_shift).values(
+    active_shift = await get_active_shift(employee_id)
+    query = update(Shift).where(Shift.id == active_shift.id).values(
         end_shift_cash=cash_report,
         end_shift_terminal_report=terminal_report,
         end_shift_tobacco_photo_id=tobacco_photo,
-        end_shift_coals_count=remaining_coals,
-        extra_information=extra_information
+        extra_information=extra_information,
+        close_datetime=datetime.now()
     )
     await session.execute(query)
     await session.commit()
