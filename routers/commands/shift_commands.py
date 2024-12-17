@@ -1,10 +1,12 @@
+from datetime import datetime
+
 from aiogram import Router, types, F
 from aiogram.fsm.context import FSMContext
 from keyboards.employe_keyboard import get_point_selection_keyboard, get_shift_management_keyboard, \
     get_confirmation_keyboard, get_photo_confirmation_keyboard
 from fsm.shift_fsm import ShiftStates
 from aiogram.filters import Command, StateFilter
-from db.crud import create_shift, initialize_points_of_sale
+from db.crud import create_shift, initialize_points_of_sale, get_point_name_by_shift_id, close_shift
 from utils.caption_utils import final_info_util
 
 router = Router()
@@ -217,17 +219,19 @@ async def finish_shift(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
 
     # Сохраняем данные в базу или журнал (пример).
-    point = data.get("point")
+    point = await get_point_name_by_shift_id(callback.from_user.id)
     start_shift_money = data.get("cash")
-    cash_report = data.get("cash_report")
+    end_shift_cash_report = data.get("cash_report")
     terminal_report = data.get("terminal_report")
     extra_information = data.get("extra_information")
+
+    print(f"{end_shift_cash_report} ")
 
     await callback.message.edit_caption(
         caption=(
             f"Смена на точке <b>{point}</b> завершена.\n\n"
             f"Сумма в кассе на начало смены: <b>{start_shift_money}</b>\n\n"
-            f"Рапорт кассы: <b>{cash_report}</b>\n"
+            f"Рапорт кассы: <b>{end_shift_cash_report}</b>\n"
             f"Рапорт терминала: <b>{terminal_report}</b>\n\n"
             f"Дополнительная информация <b>{extra_information}</b>\n\n"
 
@@ -236,6 +240,12 @@ async def finish_shift(callback: types.CallbackQuery, state: FSMContext):
         parse_mode="HTML",
         reply_markup=None
     )
+
+    await close_shift(cash_report=end_shift_cash_report,
+                      terminal_report=terminal_report,
+                      tobacco_photo=data.get("tobacco_photo"),
+                      extra_information=extra_information,
+                      employee_id=callback.from_user.id)
     await state.clear()
 
 

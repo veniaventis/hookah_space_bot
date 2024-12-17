@@ -1,7 +1,7 @@
-import datetime
 from sqlalchemy import Integer, Text, ForeignKey, String, DateTime
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from db.database import Base
+
 
 class PointOfSale(Base):
     __tablename__ = 'points_of_sale'
