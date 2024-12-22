@@ -13,7 +13,7 @@ from utils.caption_utils import final_info_util
 router = Router()
 
 
-@router.message(Command("start_shift"), F.from_user.id.in_({5477880310, 1614891721, 474221646, 302383927}),
+@router.message(Command("start_shift"), F.from_user.id.in_({5477880310, 1614891721, 474221646, 302383927, 265888264}),
                 StateFilter(None))
 async def start_command(message: types.Message, state: FSMContext):
     await initialize_points_of_sale()
@@ -113,7 +113,7 @@ async def change_photo(callback: types.CallbackQuery, state: FSMContext):
 
 
 @router.message(Command("close_shift"), StateFilter(ShiftStates.working), F.from_user.id.in_(
-    {5477880310, 1614891721, 474221646, 302383927}))  #Когда появится база данных добавить сюда id пользователей
+    {5477880310, 1614891721, 474221646, 302383927, 265888264}))  #Когда появится база данных добавить сюда id пользователей
 async def close_shift_start(message: types.Message, state: FSMContext):
     await message.reply("Введите раппорт кассы (сумма в кассе):")
     await state.set_state(ShiftStates.enter_cash_report)
