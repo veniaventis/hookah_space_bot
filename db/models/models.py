@@ -38,6 +38,7 @@ class Shift(Base):
     point: Mapped[int] = mapped_column(Integer, nullable=False)
     start_shift_cash: Mapped[int] = mapped_column(Integer, nullable=False)
     start_shift_tobacco_photo_id: Mapped[str] = mapped_column(Text, nullable=False)
+    orders: Mapped[list["Order"]] = relationship('Order', back_populates='shift')
 
     # Поля конца смены
 
@@ -52,3 +53,17 @@ class Shift(Base):
     employee: Mapped["Employee"] = relationship('Employee', back_populates='shift')
     point_of_sale: Mapped["PointOfSale"] = relationship('PointOfSale', back_populates='shift')
     # orders: Mapped[list["Order"]] = relationship('Order', back_populates='shift')
+
+
+class Order(Base):
+    __tablename__ = 'orders'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    shift_id: Mapped[int] = mapped_column(Integer, ForeignKey('shifts.id'), nullable=False)
+    hookah_type: Mapped[str] = mapped_column(String(50), nullable=False)
+    price: Mapped[float] = mapped_column(Integer, nullable=False)
+    payment_method: Mapped[str] = mapped_column(String(50), nullable=False)
+    comment: Mapped[str] = mapped_column(Text, nullable=True)
+
+    # Связь с таблицей Shift
+    shift: Mapped["Shift"] = relationship('Shift', back_populates='orders')
