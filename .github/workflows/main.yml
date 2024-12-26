@@ -13,28 +13,37 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12' # Замени на версию, которую используешь
-
-      - name: Install dependencies
+      - name: Build Docker image
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt # Если есть файл с зависимостями
+          docker build -t test-telegram-bot .
 
-      - name: Run Telegram Bot
+      - name: Run Telegram Bot in container
         env:
-          BOT_TOKEN: ${{ secrets.TEST_BOT_TOKEN }} # Добавь BOT_TOKEN в secrets репозитория
+          BOT_TOKEN: ${{ secrets.TEST_BOT_TOKEN }}
+          DATA_BASE_URL: ${{ secrets.DATA_BASE_URL }}
         run: |
-          python hookah_space_bot.py & # Запусти бота в фоне
-          sleep 10 # Подожди несколько секунд, чтобы бот подключился
+          docker run -d --name telegram-bot-container \
+            -e BOT_TOKEN=${BOT_TOKEN} \
+            -e DATA_BASE_URL=${DATA_BASE_URL} \
+            test-telegram-bot
 
-      - name: Check Bot is Running
+      - name: Wait for bot to start
         run: |
-          if pgrep -f "hookah_space_bot.py"; then
-            echo "Bot is running successfully."
+          echo "Waiting for 10 seconds to allow the bot to start..."
+          sleep 10
+
+      - name: Check container status
+        run: |
+          STATUS=$(docker inspect -f '{{.State.Status}}' telegram-bot-container)
+          if [ "$STATUS" = "running" ]; then
+            echo "Container is running successfully."
           else
-            echo "Bot failed to start."
+            echo "Container failed to start. Status: $STATUS"
             exit 1
           fi
+
+      - name: Stop and clean up container
+        if: always()
+        run: |
+          docker stop telegram-bot-container
+          docker rm telegram-bot-container
