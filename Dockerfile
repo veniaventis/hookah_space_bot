@@ -10,6 +10,9 @@ COPY . /app
 # Устанавливаем зависимости (если они есть в requirements.txt)
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Создаем директорию для хранения данных
+RUN mkdir -p /app/data
+
 # Устанавливаем переменную окружения для токена бота
 ENV BOT_TOKEN=""
 
