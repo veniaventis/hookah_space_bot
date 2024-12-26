@@ -7,13 +7,13 @@ from keyboards.employe_keyboard import get_point_selection_keyboard, get_shift_m
 from fsm.shift_fsm import ShiftStates
 from aiogram.filters import Command, StateFilter
 from db.crud import create_shift, initialize_points_of_sale, get_point_name_by_shift_id, close_shift, \
-    get_start_shift_cash
+    get_start_shift_cash, get_employees_id
 from utils.caption_utils import final_info_util
 
 router = Router()
 
 
-@router.message(Command("start_shift"), F.from_user.id.in_({5477880310, 1614891721, 474221646, 302383927, 265888264, 802172903}),
+@router.message(Command("start_shift"), F.from_user.id.in_(get_employees_id()),
                 StateFilter(None))
 async def start_command(message: types.Message, state: FSMContext):
     await initialize_points_of_sale()

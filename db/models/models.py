@@ -10,7 +10,7 @@ class PointOfSale(Base):
     name: Mapped[str] = mapped_column(String(100), nullable=False)
 
     # Связь точек продажи с сменами и сотрудниками
-    employees: Mapped[list["Employee"]] = relationship('Employee', back_populates='point_of_sale')
+    # employees: Mapped[list["Employee"]] = relationship('Employee', back_populates='point_of_sale')
     shift: Mapped[list["Shift"]] = relationship('Shift', back_populates='point_of_sale')
 
 
@@ -18,11 +18,11 @@ class Employee(Base):
     __tablename__ = 'employees'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    name: Mapped[str] = mapped_column(Text, nullable=False)
-    point_id: Mapped[int] = mapped_column(Integer, ForeignKey('points_of_sale.id'), nullable=False)
+    name: Mapped[str] = mapped_column(Text, nullable=True)
+    # point_id: Mapped[int] = mapped_column(Integer, ForeignKey('points_of_sale.id'), nullable=True)
 
     # Связь сотрудников с точками продажи и сменами
-    point_of_sale: Mapped["PointOfSale"] = relationship('PointOfSale', back_populates='employees')
+    # point_of_sale: Mapped["PointOfSale"] = relationship('PointOfSale', back_populates='employees')
     shift: Mapped[list["Shift"]] = relationship('Shift', back_populates='employee')
 
 

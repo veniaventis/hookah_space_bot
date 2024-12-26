@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import select, update
-from db.models.models import Shift, PointOfSale
+from db.models.models import Shift, PointOfSale, Employee
 from .base import connection
 
 
@@ -96,3 +96,18 @@ async def close_shift(
     )
     await session.execute(query)
     await session.commit()
+
+
+@connection
+async def get_employees_id(session):
+    query = select(Employee.id).distinct()
+    result = await session.execute(query)
+    return result.scalars().all()
+
+
+@connection
+async def create_employee(session, employee_id: int, employee_name: str):
+    new_employee = Employee(id=employee_id, name=employee_name)
+    session.add(new_employee)
+    await session.commit()
+    return new_employee
