@@ -99,15 +99,27 @@ async def close_shift(
 
 
 @connection
-async def get_employees_id(session):
+async def load_employee(session):
     query = select(Employee.id).distinct()
     result = await session.execute(query)
-    return result.scalars().all()
+    employees_id = result.scalars().all()
+    return employees_id
+
+
+@connection
+async def get_employee_by_id(session, employee_id: int):
+    query = select(Employee).where(Employee.id == employee_id)
+    result = await session.execute(query)
+    return result.scalar()
 
 
 @connection
 async def create_employee(session, employee_id: int, employee_name: str):
+    existing_employee = await load_employee()
+    if employee_id in existing_employee:
+        raise ValueError(f"Сотрудник с id {employee_id} уже существует в базе данных.")
     new_employee = Employee(id=employee_id, name=employee_name)
     session.add(new_employee)
     await session.commit()
+    await load_employee()
     return new_employee
