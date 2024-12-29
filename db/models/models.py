@@ -30,6 +30,7 @@ class Shift(Base):
     employee_id: Mapped[int] = mapped_column(Integer, ForeignKey('employees.id'), nullable=False)
     point_id: Mapped[int] = mapped_column(Integer, ForeignKey('points_of_sale.id'), nullable=False)
     open_datetime: Mapped[DateTime] = mapped_column(DateTime, nullable=False)
+    point: Mapped[str] = mapped_column(String(100), nullable=False)
 
     # Поля начала смены
     start_shift_cash: Mapped[int] = mapped_column(Integer, nullable=False)
