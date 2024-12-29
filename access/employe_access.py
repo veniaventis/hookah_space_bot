@@ -1,3 +1,0 @@
-employe_list = {
-
-}
