@@ -1,22 +1,20 @@
-from datetime import datetime
-
 from aiogram import Router, types, F
 from aiogram.fsm.context import FSMContext
 from keyboards.employe_keyboard import get_point_selection_keyboard, get_shift_management_keyboard, \
     get_confirmation_keyboard, get_photo_confirmation_keyboard
 from fsm.shift_fsm import ShiftStates
 from aiogram.filters import Command, StateFilter
-from db.crud import create_shift, initialize_points_of_sale, get_point_name_by_shift_id, close_shift, \
+from db.crud import create_shift, get_point_name_by_shift_id, close_shift, \
     get_start_shift_cash
 from utils.caption_utils import final_info_util
+from filters.employee_filter import EmployeeFilter
+
 
 router = Router()
 
 
-@router.message(Command("start_shift"), F.from_user.id.in_({5477880310, 1614891721, 474221646, 302383927, 265888264, 802172903}),
-                StateFilter(None))
+@router.message(Command("start_shift"), EmployeeFilter())
 async def start_command(message: types.Message, state: FSMContext):
-    await initialize_points_of_sale()
     await message.answer("Выберите точку продаж:", reply_markup=get_point_selection_keyboard())
     await state.set_state(ShiftStates.choose_point)
 
@@ -112,8 +110,7 @@ async def change_photo(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(ShiftStates.upload_tobacco_photo)
 
 
-@router.message(Command("close_shift"), StateFilter(ShiftStates.working), F.from_user.id.in_(
-    {5477880310, 1614891721, 474221646, 302383927, 265888264, 802172903}))  #Когда появится база данных добавить сюда id пользователей
+@router.message(Command("close_shift"), StateFilter(ShiftStates.working), EmployeeFilter())  #Когда появится база данных добавить сюда id пользователей
 async def close_shift_start(message: types.Message, state: FSMContext):
     await message.reply("Введите раппорт кассы (сумма в кассе):")
     await state.set_state(ShiftStates.enter_cash_report)
@@ -183,7 +180,8 @@ async def upload_remaining_tobacco(message: types.Message, state: FSMContext):
 
 @router.callback_query(StateFilter(ShiftStates.confirm_remaining_tobacco_photo), F.data == "confirm_photo")
 async def confirm_tobacco_photo(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.answer("Введите допалнительную информацию (Напрмиер количество фруктов, количество оставщихся углей)")
+    await callback.message.answer(
+        "Введите допалнительную информацию (Напрмиер количество фруктов, количество оставщихся углей)")
     await state.set_state(ShiftStates.extra_information)
 
 

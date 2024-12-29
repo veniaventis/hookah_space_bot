@@ -18,6 +18,7 @@ class ShiftStates(StatesGroup):
     extra_information = State()
     confirm_close_shift = State()
 
+
 class OrderStates(StatesGroup):
     select_payment = State()
     change_price = State()
@@ -28,5 +29,10 @@ class OrderStates(StatesGroup):
     confirm_price = State()
     enter_custom_price = State()
     enter_comment = State()
-   # класс заказа
 
+
+# класс заказа
+
+class AddEmployee(StatesGroup):
+    waiting_for_employee_id = State()
+    waiting_for_employee_name = State()
