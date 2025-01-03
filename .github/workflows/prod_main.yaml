@@ -35,6 +35,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            docker pull ${{ secrets.DOCKER_USERNAME }}/hookah_space_bot:latest
             # Стоп и удаление старого контейнера
             docker stop hookah_space_bot || true
             docker rm hookah_space_bot || true
