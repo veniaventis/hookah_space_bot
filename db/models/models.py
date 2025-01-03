@@ -34,7 +34,8 @@ class Shift(Base):
 
     # Поля начала смены
     start_shift_cash: Mapped[int] = mapped_column(Integer, nullable=False)
-    start_shift_tobacco_photo_id: Mapped[str] = mapped_column(Text, nullable=False)
+    start_shift_light_tobacco_photo_id: Mapped[str] = mapped_column(Text, nullable=True)
+    start_shift_dark_tobacco_photo_id: Mapped[str] = mapped_column(Text, nullable=True)
 
     # Поля конца смены
     end_shift_cash: Mapped[int] = mapped_column(Integer, nullable=True)
