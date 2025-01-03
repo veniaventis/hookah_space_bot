@@ -46,3 +46,4 @@ class Shift(Base):
     # Связи
     employee: Mapped["Employee"] = relationship('Employee', back_populates='shifts')
     point_of_sale: Mapped["PointOfSale"] = relationship('PointOfSale', back_populates='shifts')
+
