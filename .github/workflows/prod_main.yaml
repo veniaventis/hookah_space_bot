@@ -44,7 +44,7 @@ jobs:
               -v ~/hookah_space_bot_data:/app/data \
               -e DATA_BASE_URL=${{ secrets.DATA_BASE_URL }} \
               -e BOT_TOKEN=${{ secrets.PROD_BOT_TOKEN }} \
-              ${{ secrets.DOCKER_USERNAME }}/hookah_space_bot:latest alembic upgrade head
+              ${{ secrets.DOCKER_USERNAME }}/hookah_space_bot:latest /usr/local/bin/alembic upgrade head
 
             # Перезапуск контейнера с ботом
             docker run -d --name hookah_space_bot \
