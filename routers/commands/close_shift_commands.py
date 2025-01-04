@@ -5,7 +5,8 @@ from aiogram.fsm.context import FSMContext
 from db.crud import get_point_name_by_shift_id, get_start_shift_cash, close_shift
 from filters.employee_filter import EmployeeFilter
 from fsm.shift_fsm import ShiftStates
-from keyboards.employe_keyboard import get_confirmation_keyboard, get_photo_confirmation_keyboard
+from keyboards.employe_keyboard import get_confirmation_keyboard, get_photo_confirmation_keyboard, \
+    get_changer_information_close_shift
 from utils.caption_utils import final_info_util
 
 router = Router()
@@ -169,8 +170,6 @@ async def finish_shift(callback: types.CallbackQuery, state: FSMContext):
     terminal_report = data.get("terminal_report")
     extra_information = data.get("extra_information")
 
-    print(f"{end_shift_cash_report} ")
-
     await callback.message.edit_text(
         text=(
             f"Смена на точке <b>{point}</b> завершена.\n\n"
@@ -190,9 +189,32 @@ async def finish_shift(callback: types.CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(StateFilter(ShiftStates.confirm_close_shift), F.data == "change")
-async def cancel_finish_shift(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.answer(
-        "Завершение смены отменено. Вы можете повторить процесс, используя команду /close_shift",
-        reply_markup=None
+async def change_information(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.edit_text(
+        text="Выберите место от которого хотите изменить данные",
+        reply_markup=get_changer_information_close_shift()
     )
     await state.set_state(ShiftStates.working)
+
+
+@router.callback_query(F.data == "end_cash_report")
+@router.callback_query(F.data == "end_terminal_report")
+@router.callback_query(F.data == "end_upload_light_tobacco_photo")
+@router.callback_query(F.data == "end_upload_dark_tobacco_photo")
+@router.callback_query(F.data == "end_extra_information")
+async def change_information(callback: types.CallbackQuery, state: FSMContext):
+    if callback.data == "end_cash_report":
+        await callback.message.answer("Введите рапорт кассы")
+        await state.set_state(ShiftStates.enter_cash_report)
+    elif callback.data == "end_terminal_report":
+        await callback.message.answer("Введите рапорт терминала")
+        await state.set_state(ShiftStates.enter_terminal_report)
+    elif callback.data == "end_upload_light_tobacco_photo":
+        await callback.message.answer("Пришлите фотографию веса светлого табака")
+        await state.set_state(ShiftStates.upload_remaining_light_tobacco)
+    elif callback.data == "end_upload_dark_tobacco_photo":
+        await callback.message.answer("Пришлите фотографию веса темного табака")
+        await state.set_state(ShiftStates.upload_remaining_dark_tobacco_photo)
+    elif callback.data == "end_extra_information":
+        await callback.message.answer("Введите дополнительную информацию:")
+        await state.set_state(ShiftStates.extra_information)

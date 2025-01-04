@@ -182,7 +182,8 @@ async def open_shift(callback: types.CallbackQuery, state: FSMContext):
 @router.callback_query(StateFilter(ShiftStates.resume), F.data == "change")
 async def change_information(callback: types.CallbackQuery):
     await callback.message.edit_text(
-        "Выберите место от которого хотите изменить данные", reply_markup=get_change_information_open_shift_keyboard()
+        "Выберите место от которого хотите изменить данные",
+        reply_markup=get_change_information_open_shift_keyboard()
     )
 
 
