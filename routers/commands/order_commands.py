@@ -10,12 +10,12 @@ from keyboards.order_keyboard import (
     get_payment_keyboard_back
 )
 from fsm.shift_fsm import ShiftStates, OrderStates
+from filters.employee_filter import EmployeeFilter
 
 router = Router()
 
 
-@router.message(Command("order"), StateFilter(ShiftStates.working), F.from_user.id.in_({5477880310, 1614891721,
-                                                                                        302383927, 265888264, 802172903}))
+@router.message(Command("order"), StateFilter(ShiftStates.working), EmployeeFilter())
 async def order_command(message: types.Message, state: FSMContext):
     # Если смена открыта, продолжаем выполнение
     await message.answer("Заказ открыт:", reply_markup=get_open_order_keyboard())

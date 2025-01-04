@@ -24,10 +24,10 @@ jobs:
       # 3. Сборка и публикация Docker-образа
       - name: Build and push Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/hookah_space_bot:latest .
+          docker build --cache-from ${{ secrets.DOCKER_USERNAME }}/hookah_space_bot:latest -t ${{ secrets.DOCKER_USERNAME }}/hookah_space_bot:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/hookah_space_bot:latest
 
-      # 4. Перезапуск контейнера на сервере с передачей BOT_TOKEN
+      # 4. Перезапуск контейнера с выполнением миграции в одном шаге
       - name: Deploy to OVH Server
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -36,8 +36,18 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             docker pull ${{ secrets.DOCKER_USERNAME }}/hookah_space_bot:latest
+            # Стоп и удаление старого контейнера
             docker stop hookah_space_bot || true
             docker rm hookah_space_bot || true
+            
+            # Запуск контейнера с миграциями (alembic upgrade head)
+            docker run --rm \
+              -v ~/hookah_space_bot_data:/app/data \
+              -e DATA_BASE_URL=${{ secrets.DATA_BASE_URL }} \
+              -e BOT_TOKEN=${{ secrets.PROD_BOT_TOKEN }} \
+              ${{ secrets.DOCKER_USERNAME }}/hookah_space_bot:latest /usr/local/bin/alembic upgrade head
+
+            # Перезапуск контейнера с ботом
             docker run -d --name hookah_space_bot \
               --restart always \
               -v ~/hookah_space_bot_data:/app/data \
