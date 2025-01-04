@@ -130,10 +130,11 @@ async def create_employee(session, employee_id: int, employee_name: str):
 
 
 @connection
-async def create_order(session, shift_id: int, hookah_type: str, price: float, payment_method: str,
+async def create_order(session, employee_id: int, hookah_type: str, price: float, payment_method: str,
                        comment: str = None):
+    shift_id = await get_active_shift(employee_id)
     new_order = Order(
-        shift_id=shift_id,
+        shift_id=shift_id.id,
         hookah_type=hookah_type,
         price=price,
         payment_method=payment_method,
