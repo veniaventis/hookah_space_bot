@@ -84,7 +84,8 @@ async def close_shift(
         session,
         cash_report: float,
         terminal_report: float,
-        tobacco_photo: str,
+        light_tobacco_photo: str,
+        dark_tobacco_photo: str,
         extra_information: str,
         employee_id: int,
 ):
@@ -92,7 +93,8 @@ async def close_shift(
     query = update(Shift).where(Shift.id == active_shift.id).values(
         end_shift_cash=cash_report,
         end_shift_terminal_report=terminal_report,
-        end_shift_tobacco_photo_id=tobacco_photo,
+        end_shift_light_tobacco_photo_id=light_tobacco_photo,
+        end_shift_dark_tobacco_photo_id=dark_tobacco_photo,
         extra_information=extra_information,
         close_datetime=datetime.now()
     )
