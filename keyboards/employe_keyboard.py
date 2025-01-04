@@ -63,3 +63,23 @@ def get_change_information_open_shift_keyboard():
     rows = [row, row1, row2, row3]
     keyboard = InlineKeyboardMarkup(inline_keyboard=rows)
     return keyboard
+
+
+def get_changer_information_close_shift():
+    cash_report = InlineKeyboardButton(text="📃 Рапорт кассы", callback_data="end_cash_report")
+    terminal_report = InlineKeyboardButton(text="📠 Рапорт терминала", callback_data="end_terminal_report")
+    upload_light_tobacco_photo = InlineKeyboardButton(text="🤍 Фото остатков светлого табака",
+                                                      callback_data="end_upload_light_tobacco_photo")
+    upload_dark_tobacco_photo = InlineKeyboardButton(text="🖤 Фото остатков темного табака",
+                                                     callback_data="end_upload_dark_tobacco_photo")
+    extra_information = InlineKeyboardButton(text="📝 Дополнительная информация",
+                                             callback_data="end_extra_information")
+    row = [cash_report]
+    row1 = [terminal_report]
+    row2 = [upload_light_tobacco_photo]
+    row3 = [upload_dark_tobacco_photo]
+    row4 = [extra_information]
+    rows = [row, row1, row2, row3, row4]
+    keyboard = InlineKeyboardMarkup(inline_keyboard=rows)
+    return keyboard
+
