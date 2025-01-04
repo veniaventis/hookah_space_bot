@@ -34,14 +34,12 @@ class Shift(Base):
 
     # Поля начала смены
     start_shift_cash: Mapped[int] = mapped_column(Integer, nullable=False)
-    start_shift_light_tobacco_photo_id: Mapped[str] = mapped_column(Text, nullable=True)
-    start_shift_dark_tobacco_photo_id: Mapped[str] = mapped_column(Text, nullable=True)
+    start_shift_tobacco_photo_id: Mapped[str] = mapped_column(Text, nullable=False)
 
     # Поля конца смены
     end_shift_cash: Mapped[int] = mapped_column(Integer, nullable=True)
     end_shift_terminal_report: Mapped[str] = mapped_column(Integer, nullable=True)
-    end_shift_light_tobacco_photo_id: Mapped[str] = mapped_column(Text, nullable=True)
-    end_shift_dark_tobacco_photo_id: Mapped[str] = mapped_column(Text, nullable=True)
+    end_shift_tobacco_photo_id: Mapped[str] = mapped_column(Text, nullable=True)
     extra_information: Mapped[str] = mapped_column(Text, nullable=True)
     close_datetime: Mapped[DateTime] = mapped_column(DateTime, nullable=True)
 

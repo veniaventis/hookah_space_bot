@@ -33,8 +33,7 @@ async def get_point_id_by_name(session, point_name):
 
 
 @connection
-async def create_shift(session, start_shift_cash: float, tobacco_light_photo_id: str, tobacco_dark_photo_id: str,
-                       employee_id: int,
+async def create_shift(session, start_shift_cash: float, tobacco_photo_id: str, employee_id: int,
                        point_name: str):
     point_id = await get_point_id_by_name(point_name)
     if not point_id:
@@ -45,8 +44,7 @@ async def create_shift(session, start_shift_cash: float, tobacco_light_photo_id:
                       open_datetime=datetime.now(),
                       point=point_name,
                       start_shift_cash=start_shift_cash,
-                      start_shift_light_tobacco_photo_id=tobacco_light_photo_id,
-                      start_shift_dark_tobacco_photo_id=tobacco_dark_photo_id)
+                      start_shift_tobacco_photo_id=tobacco_photo_id)
     session.add(new_shift)
     await session.commit()
     return new_shift
@@ -84,8 +82,7 @@ async def close_shift(
         session,
         cash_report: float,
         terminal_report: float,
-        light_tobacco_photo: str,
-        dark_tobacco_photo: str,
+        tobacco_photo: str,
         extra_information: str,
         employee_id: int,
 ):
@@ -93,8 +90,7 @@ async def close_shift(
     query = update(Shift).where(Shift.id == active_shift.id).values(
         end_shift_cash=cash_report,
         end_shift_terminal_report=terminal_report,
-        end_shift_light_tobacco_photo_id=light_tobacco_photo,
-        end_shift_dark_tobacco_photo_id=dark_tobacco_photo,
+        end_shift_tobacco_photo_id=tobacco_photo,
         extra_information=extra_information,
         close_datetime=datetime.now()
     )
