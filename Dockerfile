@@ -16,5 +16,9 @@ RUN mkdir -p /app/data
 # Устанавливаем переменную окружения для токена бота
 ENV BOT_TOKEN=""
 
+RUN which alembic
+
 # Запускаем бота
 CMD ["python", "hookah_space_bot.py"]
+
+

@@ -1,3 +1,5 @@
 poetry.lock
 .venv
 .idea
+*.lock
+/app/data/hookah_space.sqlite3

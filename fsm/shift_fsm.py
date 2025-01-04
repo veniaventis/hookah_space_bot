@@ -6,17 +6,23 @@ class ShiftStates(StatesGroup):
     choose_point = State()
     enter_cash = State()
     confirm_cash = State()
-    upload_tobacco_photo = State()
-    confirm_tobacco_photo = State()
+    upload_light_tobacco_photo = State()
+    confirm_light_tobacco_photo = State()
+    upload_dark_tobacco_photo = State()
+    confirm_dark_tobacco_photo = State()
+    resume = State()
     working = State()
 
     # Закрытие смены
     enter_cash_report = State()
     enter_terminal_report = State()
-    upload_remaining_tobacco = State()
-    confirm_remaining_tobacco_photo = State()
+    upload_remaining_light_tobacco = State()
+    confirm_remaining_light_tobacco_photo = State()
+    upload_remaining_dark_tobacco_photo = State()
+    confirm_remaining_dark_tobacco_photo = State()
     extra_information = State()
     confirm_close_shift = State()
+
 
 class OrderStates(StatesGroup):
     select_payment = State()
@@ -28,5 +34,10 @@ class OrderStates(StatesGroup):
     confirm_price = State()
     enter_custom_price = State()
     enter_comment = State()
-   # класс заказа
 
+
+# класс заказа
+
+class AddEmployee(StatesGroup):
+    waiting_for_employee_id = State()
+    waiting_for_employee_name = State()
