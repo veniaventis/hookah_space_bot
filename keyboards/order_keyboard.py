@@ -12,11 +12,13 @@ def get_open_order_keyboard():
 
 
 def get_choose_menu_keyboard():
-    medium = InlineKeyboardButton(text="Медиум", callback_data="position_menu_medium")
-    light = InlineKeyboardButton(text="Лайт", callback_data="position_menu_light")
-    fruit = InlineKeyboardButton(text="На фрукте", callback_data="position_menu_fruit")
-    row = [medium, light, fruit]
-    rows = [row]
+    medium = InlineKeyboardButton(text="Medium", callback_data="position_menu_medium")
+    light = InlineKeyboardButton(text="Light", callback_data="position_menu_light")
+    fruit = InlineKeyboardButton(text="Fruit", callback_data="position_menu_fruit")
+    future_fruit = InlineKeyboardButton(text="Future Fruit", callback_data="position_menu_future_fruit")
+    row = [light, fruit]
+    row1 = [medium, future_fruit]
+    rows = [row, row1]
     keyboard = InlineKeyboardMarkup(inline_keyboard=rows)
     return keyboard
 

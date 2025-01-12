@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import select, update
-from db.models.models import Shift, PointOfSale, Employee
+from db.models.models import Shift, PointOfSale, Order, Employee
 from .base import connection
 
 
@@ -127,3 +127,26 @@ async def create_employee(session, employee_id: int, employee_name: str):
     await session.commit()
     await load_employee()
     return new_employee
+
+
+@connection
+async def create_order(session, employee_id: int, hookah_type: str, price: float, payment_method: str,
+                       comment: str = None):
+    shift_id = await get_active_shift(employee_id)
+    new_order = Order(
+        shift_id=shift_id.id,
+        hookah_type=hookah_type,
+        price=price,
+        payment_method=payment_method,
+        comment=comment
+    )
+    session.add(new_order)
+    await session.commit()
+    return new_order
+
+
+@connection
+async def get_orders_by_shift(session, shift_id: int):
+    query = select(Order).where(Order.shift_id == shift_id)
+    result = await session.execute(query)
+    return result.scalars().all()

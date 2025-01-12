@@ -11,11 +11,12 @@ from keyboards.order_keyboard import (
 )
 from fsm.shift_fsm import ShiftStates, OrderStates
 from filters.employee_filter import EmployeeFilter
+from db.crud import create_order
 
 router = Router()
 
 
-@router.message(Command("order"), StateFilter(ShiftStates.working), EmployeeFilter())
+@router.message(Command("order"), EmployeeFilter())  # StateFilter(ShiftStates.working)
 async def order_command(message: types.Message, state: FSMContext):
     # Если смена открыта, продолжаем выполнение
     await message.answer("Заказ открыт:", reply_markup=get_open_order_keyboard())
@@ -31,9 +32,10 @@ async def continue_order(callback: types.CallbackQuery, state: FSMContext):
 @router.callback_query(StateFilter(OrderStates.choose_menu))
 async def select_hookah(callback: types.CallbackQuery, state: FSMContext):
     hookah_prices = {
-        "position_menu_medium": {"name": "Медиум", "price": 150},
-        "position_menu_light": {"name": "Лайт", "price": 100},
-        "position_menu_fruit": {"name": "На фрукте", "price": 200}
+        "position_menu_light": {"name": "Lite", "price": 100},
+        "position_menu_medium": {"name": "Medium", "price": 120},
+        "position_menu_fruit": {"name": "Fruit", "price": 150},
+        "position_menu_future_fruit": {"name": "Future Fruit", "price": 200}
     }
     selected_data = hookah_prices[callback.data]
     await state.update_data(hookah=selected_data["name"], price=selected_data["price"])
@@ -95,7 +97,6 @@ async def enter_custom_price(message: types.Message, state: FSMContext):
 async def enter_comment(message: types.Message, state: FSMContext):
     comment = message.text
     data = await state.get_data()
-    data = await state.get_data()
     hookah = data.get("hookah")
     price = data.get("price")
 
@@ -145,6 +146,15 @@ async def back_change_payment(callback: types.CallbackQuery, state: FSMContext):
 async def close_order(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.edit_text(
         "Заказ принят и закрыт.\nCпасибо",
+    )
+    data = await state.get_data()
+
+    await create_order(
+        employee_id=callback.from_user.id,
+        hookah_type=data.get("hookah"),
+        price=data.get("price"),
+        payment_method=data.get("payment"),
+        comment=data.get("comment")
     )
     await state.clear()
     await state.set_state(ShiftStates.working)
