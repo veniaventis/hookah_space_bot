@@ -32,9 +32,10 @@ async def continue_order(callback: types.CallbackQuery, state: FSMContext):
 @router.callback_query(StateFilter(OrderStates.choose_menu))
 async def select_hookah(callback: types.CallbackQuery, state: FSMContext):
     hookah_prices = {
-        "position_menu_medium": {"name": "Медиум", "price": 150},
-        "position_menu_light": {"name": "Лайт", "price": 100},
-        "position_menu_fruit": {"name": "На фрукте", "price": 200}
+        "position_menu_light": {"name": "Lite", "price": 100},
+        "position_menu_medium": {"name": "Medium", "price": 120},
+        "position_menu_fruit": {"name": "Fruit", "price": 150},
+        "position_menu_future_fruit": {"name": "Future Fruit", "price": 200}
     }
     selected_data = hookah_prices[callback.data]
     await state.update_data(hookah=selected_data["name"], price=selected_data["price"])
