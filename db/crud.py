@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import select, update
+from sqlalchemy import select, update, func, extract
 from db.models.models import Shift, PointOfSale, Order, Employee
 from .base import connection
 
@@ -150,3 +150,32 @@ async def get_orders_by_shift(session, shift_id: int):
     query = select(Order).where(Order.shift_id == shift_id)
     result = await session.execute(query)
     return result.scalars().all()
+
+
+@connection
+async def get_monthly_report(session, month):
+    query = (
+        select(func.sum(Order.price))
+        .filter(
+            extract('year', Order.created_at) == datetime.now().year,
+            extract('month', Order.created_at) == month
+        )
+    )
+    result = await session.execute(query)
+    total_price = result.scalar()
+    return total_price or 0
+
+
+@connection
+async def get_monthly_total_by_payment(session, month: int, payment_method: str) -> float:
+    query = (
+        select(func.sum(Order.price))
+        .filter(
+            extract('year', Order.created_at) == datetime.now().year,
+            extract('month', Order.created_at) == month,
+            Order.payment_method == payment_method  # Фильтр по способу оплаты
+        )
+    )
+    result = await session.execute(query)
+    total_price = result.scalar()  # Получаем сумму
+    return total_price or 0
