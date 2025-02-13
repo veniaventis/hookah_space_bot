@@ -1,7 +1,8 @@
 from aiogram import Router, types, F
 from aiogram.fsm.context import FSMContext
 from keyboards.employe_keyboard import get_point_selection_keyboard, get_shift_management_keyboard, \
-    get_confirmation_keyboard, get_photo_confirmation_keyboard, get_change_information_open_shift_keyboard
+    get_photo_confirmation_keyboard, get_change_information_open_shift_keyboard
+from keyboards.common_keyboard import get_confirmation_keyboard
 from fsm.shift_fsm import ShiftStates
 from aiogram.filters import Command, StateFilter
 from db.crud import create_shift
@@ -13,17 +14,18 @@ router = Router()
 @router.message(Command("start_shift"), EmployeeFilter())
 async def start_command(message: types.Message, state: FSMContext):
     await message.answer("Выберите точку продаж:", reply_markup=get_point_selection_keyboard())
-    await state.set_state(ShiftStates.choose_point)
+    await state.set_state(ShiftStates.shift_state)
 
 
-@router.callback_query(F.data == "point_bliski")
-@router.callback_query(F.data == "point_aioli")
+@router.callback_query(StateFilter(ShiftStates.shift_state), F.data == "point_bliski")
+@router.callback_query(StateFilter(ShiftStates.shift_state), F.data == "point_aioli")
 async def select_point(callback: types.CallbackQuery, state: FSMContext):
     point = "Bliski Wschod" if callback.data == "point_bliski" else "Aioli"
     await state.update_data(point=point)
     await callback.message.edit_text(
         f"Вы выбрали точку: <b>{point}</b>.\n\nНажмите <i>'Открыть смену'</i>. Или выберите другую точку.",
         reply_markup=get_shift_management_keyboard())
+    await state.set_state(ShiftStates.choose_point)
 
 
 @router.callback_query(F.data == "open_shift")
@@ -32,10 +34,10 @@ async def open_shift(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(ShiftStates.enter_cash)
 
 
-@router.callback_query(F.data == "back")
+@router.callback_query(StateFilter(ShiftStates.choose_point), F.data == "back")
 async def back(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.edit_text("Выберите точку продаж:", reply_markup=get_point_selection_keyboard())
-    await state.set_state(ShiftStates.choose_point)
+    await state.set_state(ShiftStates.shift_state)
 
 
 @router.message(StateFilter(ShiftStates.enter_cash))

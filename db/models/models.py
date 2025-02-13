@@ -55,10 +55,10 @@ class Order(Base):
     __tablename__ = 'orders'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    shift_id: Mapped[int] = mapped_column(Integer, ForeignKey('shifts.id'), nullable=False)
-    hookah_type: Mapped[str] = mapped_column(String(50), nullable=False)
-    price: Mapped[float] = mapped_column(Integer, nullable=False)
-    payment_method: Mapped[str] = mapped_column(String(50), nullable=False)
+    shift_id: Mapped[int] = mapped_column(Integer, ForeignKey('shifts.id'), nullable=True)
+    hookah_type: Mapped[str] = mapped_column(String(50), nullable=True)
+    price: Mapped[float] = mapped_column(Integer, nullable=True)
+    payment_method: Mapped[str] = mapped_column(String(50), nullable=True)
     comment: Mapped[str] = mapped_column(Text, nullable=True)
 
     # Связь с таблицей Shift
