@@ -19,7 +19,7 @@ router = Router()
 @router.message(Command("order"), EmployeeFilter())  # StateFilter(ShiftStates.working)
 async def order_command(message: types.Message, state: FSMContext):
     # Если смена открыта, продолжаем выполнение
-    await message.answer("Заказ открыт:", reply_markup=get_open_order_keyboard())
+    await message.answer("Заказ открыт", reply_markup=get_open_order_keyboard())
     await state.set_state(OrderStates.choose_menu)
 
 

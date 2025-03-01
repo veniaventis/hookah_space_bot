@@ -3,6 +3,7 @@ from aiogram.fsm.state import State, StatesGroup
 
 class ShiftStates(StatesGroup):
     # Открытие смены
+    shift_state = State()
     choose_point = State()
     enter_cash = State()
     confirm_cash = State()
@@ -38,6 +39,3 @@ class OrderStates(StatesGroup):
 
 # класс заказа
 
-class AddEmployee(StatesGroup):
-    waiting_for_employee_id = State()
-    waiting_for_employee_name = State()

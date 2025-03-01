@@ -5,8 +5,9 @@ from aiogram.fsm.context import FSMContext
 from db.crud import get_point_name_by_shift_id, get_start_shift_cash, close_shift
 from filters.employee_filter import EmployeeFilter
 from fsm.shift_fsm import ShiftStates
-from keyboards.employe_keyboard import get_confirmation_keyboard, get_photo_confirmation_keyboard, \
+from keyboards.employe_keyboard import get_photo_confirmation_keyboard, \
     get_changer_information_close_shift
+from keyboards.common_keyboard import get_confirmation_keyboard
 from utils.caption_utils import final_info_util
 
 router = Router()

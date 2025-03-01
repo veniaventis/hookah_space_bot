@@ -1,18 +1,26 @@
 from aiogram import Router, F, types
-from aiogram.filters import Command, StateFilter
-from keyboards.admin_keyboard import admin_keyboard
+from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from db.crud import create_employee, get_employee_by_id
-from fsm.shift_fsm import AddEmployee
 
-from access.admin_access import admin_list
+from db.crud import get_employee_by_id, create_employee
+from fsm.admin_fsm import AddEmployee, AdminStates
+
+from keyboards.admin_keyboards.admin_staff_keyboard import manage_employee_keyboard
+from keyboards.admin_keyboards.admin_keyboard import admin_keyboard
 
 router = Router()
 
 
-@router.message(Command("admin", prefix="."), F.from_user.id.in_(admin_list))
-async def hello_admin(message: types.Message):
-    await message.reply("Привет, администратор!", reply_markup=admin_keyboard())
+@router.callback_query(F.data == "staff")
+async def staff_menu(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer("Меню управления штатом", reply_markup=manage_employee_keyboard())
+    await state.set_state(AdminStates.staff_menu)
+
+
+@router.callback_query(StateFilter(AdminStates.admin_state), F.data == "back")
+async def back(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.edit_text(f"Привет <b>{callback.from_user.full_name}</b>", reply_markup=admin_keyboard())
+    await state.set_state(AdminStates.admin_state)
 
 
 @router.callback_query(F.data == "add_employee")

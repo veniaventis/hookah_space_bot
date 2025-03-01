@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import select, update
+from sqlalchemy import select, update, func, extract
 from db.models.models import Shift, PointOfSale, Order, Employee
 from .base import connection
 
@@ -150,3 +150,88 @@ async def get_orders_by_shift(session, shift_id: int):
     query = select(Order).where(Order.shift_id == shift_id)
     result = await session.execute(query)
     return result.scalars().all()
+
+
+@connection
+async def get_monthly_report(session, month):
+    query = (
+        select(func.sum(Order.price))
+        .filter(
+            extract('year', Order.created_at) == datetime.now().year,
+            extract('month', Order.created_at) == month
+        )
+    )
+    result = await session.execute(query)
+    total_price = result.scalar()
+    return total_price or 0
+
+
+@connection
+async def get_monthly_total_by_payment(session, month: int, payment_method: str) -> float:
+    query = (
+        select(func.sum(Order.price))
+        .filter(
+            extract('year', Order.created_at) == datetime.now().year,
+            extract('month', Order.created_at) == month,
+            Order.payment_method == payment_method  # Фильтр по способу оплаты
+        )
+    )
+    result = await session.execute(query)
+    total_price = result.scalar()  # Получаем сумму
+    return total_price or 0
+
+
+@connection
+async def get_shifts_by_month(session, month: int):
+    """Получает все смены за указанный месяц"""
+    query = select(Shift).filter(
+        extract('year', Shift.created_at) == datetime.now().year,
+        extract('month', Shift.created_at) == month
+    )
+    result = await session.execute(query)
+    return result.scalars().all()
+
+
+@connection
+async def get_shift_summary(session, shift_id: int):
+    """Получает сводные данные по смене"""
+    total_orders_query = select(func.count(Order.id)).where(Order.shift_id == shift_id)
+    cash_revenue_query = select(func.sum(Order.price)).where(
+        Order.shift_id == shift_id, Order.payment_method == "cash"
+    )
+    card_revenue_query = select(func.sum(Order.price)).where(
+        Order.shift_id == shift_id, Order.payment_method == "card"
+    )
+
+    total_orders = await session.execute(total_orders_query)
+    cash_revenue = await session.execute(cash_revenue_query)
+    card_revenue = await session.execute(card_revenue_query)
+
+    return {
+        "orders_count": total_orders.scalar() or 0,
+        "cash_revenue": cash_revenue.scalar() or 0,
+        "card_revenue": card_revenue.scalar() or 0,
+    }
+
+
+@connection
+async def get_monthly_summary(session, month: int):
+    """Получает сводный отчет за месяц"""
+    total_cash_query = select(func.sum(Order.price)).filter(
+        extract('year', Order.created_at) == datetime.now().year,
+        extract('month', Order.created_at) == month,
+        Order.payment_method == "cash"
+    )
+    total_card_query = select(func.sum(Order.price)).filter(
+        extract('year', Order.created_at) == datetime.now().year,
+        extract('month', Order.created_at) == month,
+        Order.payment_method == "card"
+    )
+
+    total_cash = await session.execute(total_cash_query)
+    total_card = await session.execute(total_card_query)
+
+    return {
+        "total_cash": total_cash.scalar() or 0,
+        "total_card": total_card.scalar() or 0
+    }
