@@ -2,37 +2,29 @@ from aiogram import Router, types, F
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command, StateFilter
 from keyboards.order_keyboard import (
-    get_open_order_keyboard,
     get_choose_menu_keyboard,
     get_payment_keyboard,
     get_close_order_keyboard,
-    get_price_option_keyboard,
-    get_payment_keyboard_back
+    get_price_option_keyboard
 )
-from fsm.shift_fsm import ShiftStates, OrderStates
+from fsm.shift_fsm import ShiftStates
+from fsm.order_fsm import OrderStates
 from filters.employee_filter import EmployeeFilter
-from db.crud import create_order
+from db.crud import create_order, get_shisha_name, get_shisha_price
 
 router = Router()
 
 
-@router.message(Command("order"), EmployeeFilter())  # StateFilter(ShiftStates.working)
+@router.message(Command("order"), EmployeeFilter())#, StateFilter(ShiftStates.working))
 async def order_command(message: types.Message, state: FSMContext):
-    # Если смена открыта, продолжаем выполнение
-    await message.answer("Заказ открыт", reply_markup=get_open_order_keyboard())
-    await state.set_state(OrderStates.choose_menu)
-
-
-@router.callback_query(F.data == "choose_menu")
-async def continue_order(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.edit_text("Выберите тип кальяна:", reply_markup=get_choose_menu_keyboard())
+    await message.answer("Выберите тип кальяна:", reply_markup=get_choose_menu_keyboard())
     await state.set_state(OrderStates.choose_menu)
 
 
 @router.callback_query(StateFilter(OrderStates.choose_menu))
 async def select_hookah(callback: types.CallbackQuery, state: FSMContext):
     hookah_prices = {
-        "position_menu_light": {"name": "Lite", "price": 100},
+        "position_menu_light": {"name": "", "price": 100},
         "position_menu_medium": {"name": "Medium", "price": 120},
         "position_menu_fruit": {"name": "Fruit", "price": 150},
         "position_menu_future_fruit": {"name": "Future Fruit", "price": 200}

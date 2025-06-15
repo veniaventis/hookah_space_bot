@@ -2,13 +2,15 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
-def get_open_order_keyboard():
-    # Клавиатура для открытия и старта заказа
-    start_order = InlineKeyboardButton(text="Продолжить", callback_data="choose_menu")
-    row = [start_order]
-    rows = [row]
-    keyboard = InlineKeyboardMarkup(inline_keyboard=rows)
-    return keyboard
+# def get_open_order_keyboard():
+#     # Клавиатура для открытия и старта заказа
+#     start_order = InlineKeyboardButton(text="Открыть новый заказ", callback_data="open_new_order")
+#     display_open_orders = InlineKeyboardButton(text="Посмотреть открытые заказы", callback_data="display_open_order")
+#     row = [start_order]
+#     row1 = [display_open_orders]
+#     rows = [row,row1]
+#     keyboard = InlineKeyboardMarkup(inline_keyboard=rows)
+#     return keyboard
 
 
 def get_choose_menu_keyboard():
@@ -24,8 +26,8 @@ def get_choose_menu_keyboard():
 
 
 def get_payment_keyboard():
-    cash = InlineKeyboardButton(text="Оплата наличными", callback_data="pay_cash")
-    card = InlineKeyboardButton(text="Оплата картой", callback_data="pay_card")
+    cash = InlineKeyboardButton(text="Оплата наличными", callback_data="cash")
+    card = InlineKeyboardButton(text="Оплата картой", callback_data="card")
     bonus = InlineKeyboardButton(text="Бонус ", callback_data="bonus")
     back = InlineKeyboardButton(text=" Назад", callback_data="go_back")
     rows = [
@@ -38,17 +40,17 @@ def get_payment_keyboard():
     return keyboard
 
 
-def get_payment_keyboard_back():
-    cash = InlineKeyboardButton(text="Оплата наличными", callback_data="pay_cash")
-    card = InlineKeyboardButton(text="Оплата картой", callback_data="pay_card")
-    bonus = InlineKeyboardButton(text="Бонус ", callback_data="bonus")
-    rows = [
-        [cash],
-        [card],
-        [bonus]
-    ]
-    keyboard = InlineKeyboardMarkup(inline_keyboard=rows)
-    return keyboard
+# def get_payment_keyboard_back():
+#     cash = InlineKeyboardButton(text="Оплата наличными", callback_data="cash")
+#     card = InlineKeyboardButton(text="Оплата картой", callback_data="card")
+#     bonus = InlineKeyboardButton(text="Бонус ", callback_data="bonus")
+#     rows = [
+#         [cash],
+#         [card],
+#         [bonus]
+#     ]
+#     keyboard = InlineKeyboardMarkup(inline_keyboard=rows)
+#     return keyboard
 
 
 def get_close_order_keyboard():

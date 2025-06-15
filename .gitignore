@@ -3,3 +3,5 @@ poetry.lock
 .idea
 *.lock
 /app/data/hookah_space.sqlite3
+# Ignore Python cache files
+__pycache__/

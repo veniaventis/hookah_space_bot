@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import select, update, func, extract
-from db.models.models import Shift, PointOfSale, Order, Employee
+from db.models.models import Shift, PointOfSale, Order, Employee, HookahType
 from .base import connection
 
 
@@ -235,3 +235,17 @@ async def get_monthly_summary(session, month: int):
         "total_cash": total_cash.scalar() or 0,
         "total_card": total_card.scalar() or 0
     }
+
+
+@connection
+async def get_shisha_name(session, id: int):
+    query = select(HookahType.name).where(HookahType.id == id)
+    result = await session.execute(query)
+    return result.scalar()
+
+
+@connection
+async def get_shisha_price(sessiion, id: int):
+    query = select(HookahType.price).where(HookahType.id == id)
+    result = await sessiion.execute(query)
+    return result.scalar()

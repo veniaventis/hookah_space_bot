@@ -56,10 +56,21 @@ class Order(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     shift_id: Mapped[int] = mapped_column(Integer, ForeignKey('shifts.id'), nullable=True)
-    hookah_type: Mapped[str] = mapped_column(String(50), nullable=True)
     price: Mapped[float] = mapped_column(Integer, nullable=True)
     payment_method: Mapped[str] = mapped_column(String(50), nullable=True)
     comment: Mapped[str] = mapped_column(Text, nullable=True)
 
+    hookah_type_id: Mapped[int] = mapped_column(Integer, ForeignKey('hookah_types.id'), nullable=True)
+
     # Связь с таблицей Shift
     shift: Mapped["Shift"] = relationship('Shift', back_populates='orders')
+    hookah_type: Mapped["HookahType"] = relationship("HookahType", back_populates="orders", foreign_keys=[hookah_type_id])
+
+
+class HookahType(Base):
+    __tablename__ = 'hookah_types'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(50), nullable=True)
+    price: Mapped[float] = mapped_column(Integer, nullable=True)
+    orders: Mapped[list["Order"]] = relationship('Order', back_populates='hookah_type', foreign_keys='Order.hookah_type_id')

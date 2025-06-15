@@ -3,7 +3,7 @@ __all__ = ("router",)
 from aiogram import Router
 from .commands import router as commands_router
 from .commands.admin_commands import router as admin_commands_router
-from .commands.order_commands import router as order_commands_router
+from .commands.orders_commands import router as order_commands_router
 from .commands.shift_commands import router as shift_commands_router
 
 router = Router()
